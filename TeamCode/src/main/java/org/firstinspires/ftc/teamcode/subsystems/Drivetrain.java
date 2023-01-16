@@ -62,7 +62,7 @@ public class Drivetrain extends MecanumDrive implements Subsystem {
     public static PIDCoefficients HEADING_PID = new PIDCoefficients(0, 0, 0);
     public double lrks = 0;
     public String voltagemode = "auto";
-
+    // swerve better imo (mason was here)
     public static double LATERAL_MULTIPLIER = 1.4705882352941176470588235294118;
 
     public static double VX_WEIGHT = 1;

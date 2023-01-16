@@ -78,7 +78,7 @@ public class Lift implements Subsystem {
         }
         currentHeight = getCurrentHeight();
 
-        if (targetHeight == 0 && currentHeight < 0.3) {
+        if (targetHeight < 31 && currentHeight < 60) {
             setLiftPower(0);
         } else if (motor1.getPower() > 0.5 && motor1.getCurrent(CurrentUnit.AMPS) > 10) {
             setLiftPower(-1);

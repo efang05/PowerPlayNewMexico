@@ -34,7 +34,7 @@ public class SleeveDetector {
 
     }
     public SleeveDetectionPipeline.Color getColor() {
-        return (sleeveDetection.getAnalysis());
+        return sleeveDetection.color;
     }
     public void stop() {
         // Stop camera operation

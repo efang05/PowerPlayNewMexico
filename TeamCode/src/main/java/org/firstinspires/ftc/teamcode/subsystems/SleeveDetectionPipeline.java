@@ -30,7 +30,7 @@ public class SleeveDetectionPipeline extends OpenCvPipeline {
     /*
      * The core values which define the location and size of the sample regions
      */
-    static final Point REGION_TOPLEFT_ANCHOR_POINT = new Point(140,125);
+    static final Point REGION_TOPLEFT_ANCHOR_POINT = new Point(180,110);
     static final int REGION_WIDTH = 30;
     static final int REGION_HEIGHT = 30;
 
@@ -69,7 +69,7 @@ public class SleeveDetectionPipeline extends OpenCvPipeline {
     int frameCnt = 0;
 
     // Volatile since accessed by OpMode thread w/o synchronization
-    private volatile Color color = Color.RED;
+    public volatile Color color = Color.RED;
 
     private Telemetry telemetry;
 
@@ -181,7 +181,7 @@ public class SleeveDetectionPipeline extends OpenCvPipeline {
          */
         if(avgCr > 130) // Did it have high red hue?
         {
-            if(avgCb > 130) { //Did it have high blue hue with it?
+            if(avgCb > 120) { //Did it have high blue hue with it?
 
                 color = Color.MAGENTA;
                 /*

@@ -23,7 +23,7 @@ public class CycleAutoRedRightLowLow extends LinearOpMode {
     private ElapsedTime timer;
 
     public double liftHigh = 1075;
-    public double liftMid = 800;
+    public double liftMid = 850;
     public double liftLow = 600;
     public double liftGround = 0;
     public double liftIdle = 200;
@@ -33,6 +33,8 @@ public class CycleAutoRedRightLowLow extends LinearOpMode {
     public double turretLeft = 330;
     public double turretBack = 630;
     public double turretRight = 990;
+
+    public String park = "none";
 
     //change after tuning horizontal slides
     public double hzslidesout = 1.0;
@@ -55,7 +57,7 @@ public class CycleAutoRedRightLowLow extends LinearOpMode {
                 .addTemporalMarker(() -> {
                     robot.intake.centerArm();
                     robot.lift.setTargetHeight(340);
-                    robot.lift.setHorizontalPosition(hzslidesin);
+                    robot.lift.setHorizontalPosition(0.6);
 
                 })
                 .lineToLinearHeading(Preload_POSE)
@@ -322,7 +324,7 @@ public class CycleAutoRedRightLowLow extends LinearOpMode {
                     robot.intake.closeClaw();
                 })
                 .setVelConstraint(robot.drive.getVelocityConstraint(50, Math.toRadians(180), DriveConstants.TRACK_WIDTH))
-                .lineToLinearHeading(new Pose2d(35,-9.5, Math.toRadians(180.5)))
+                .lineToLinearHeading(new Pose2d(33.5,-9.5, Math.toRadians(180.5)))
                 .build();
 
         TrajectorySequence preloadMagentaLeft = robot.drive.trajectorySequenceBuilder(START_POSE)
@@ -330,7 +332,7 @@ public class CycleAutoRedRightLowLow extends LinearOpMode {
                 .addTemporalMarker(() -> {
                     robot.intake.centerArm();
                     robot.lift.setTargetHeight(340);
-                    robot.lift.setHorizontalPosition(hzslidesin);
+                    robot.lift.setHorizontalPosition(0.6);
 
                 })
                 .lineToLinearHeading(Preload_POSE)
@@ -597,7 +599,7 @@ public class CycleAutoRedRightLowLow extends LinearOpMode {
                     robot.intake.closeClaw();
                 })
                 .setVelConstraint(robot.drive.getVelocityConstraint(50, Math.toRadians(180), DriveConstants.TRACK_WIDTH))
-                .lineToLinearHeading(new Pose2d(12,-9.5, Math.toRadians(180.5)))
+                .lineToLinearHeading(new Pose2d(14,-9.5, Math.toRadians(180.5)))
                 .build();
 
         TrajectorySequence preloadRedRight = robot.drive.trajectorySequenceBuilder(START_POSE)
@@ -605,7 +607,7 @@ public class CycleAutoRedRightLowLow extends LinearOpMode {
                 .addTemporalMarker(() -> {
                     robot.intake.centerArm();
                     robot.lift.setTargetHeight(340);
-                    robot.lift.setHorizontalPosition(hzslidesin);
+                    robot.lift.setHorizontalPosition(0.6);
 
                 })
                 .lineToLinearHeading(Preload_POSE)
@@ -875,18 +877,46 @@ public class CycleAutoRedRightLowLow extends LinearOpMode {
                 .back(10)
                 .build();
 
-        robot.drive.setPoseEstimate(START_POSE);
+        TrajectorySequence BluePark = robot.drive.trajectorySequenceBuilder(START_POSE)
+                .setVelConstraint(robot.drive.getVelocityConstraint(30, Math.toRadians(180), DriveConstants.TRACK_WIDTH))
+                .lineToLinearHeading(Preload_POSE)
+                .lineToLinearHeading(new Pose2d(33.5,-9.5, Math.toRadians(180.5)))
+                .build();
+        TrajectorySequence MagentaPark = robot.drive.trajectorySequenceBuilder(START_POSE)
+                .setVelConstraint(robot.drive.getVelocityConstraint(30, Math.toRadians(180), DriveConstants.TRACK_WIDTH))
+                .lineToLinearHeading(Preload_POSE)
+                .waitSeconds(1)
+                .lineToLinearHeading(new Pose2d(14,-9.5, Math.toRadians(180.5)))
+                .build();
+        TrajectorySequence RedPark = robot.drive.trajectorySequenceBuilder(START_POSE)
+                .setVelConstraint(robot.drive.getVelocityConstraint(30, Math.toRadians(180), DriveConstants.TRACK_WIDTH))
+                .lineToLinearHeading(Preload_POSE)
+                .waitSeconds(1)
+                .lineToLinearHeading(new Pose2d(53.5,-9.5, Math.toRadians(170)))
+                .waitSeconds(1)
+                .back(10)
+                .build();
 
-        SleeveDetectionPipeline.Color Parking = detector.getColor();
+        robot.drive.setPoseEstimate(START_POSE);
+        SleeveDetectionPipeline.Color Parking = SleeveDetectionPipeline.Color.MAGENTA;
+
+        while (opModeInInit()) {
+            Parking = detector.getColor();
+            telemetry.addData("VAL:", detector.getColor());
+            telemetry.update();
+        }
 
         waitForStart();
 
-        if (Parking == SleeveDetectionPipeline.Color.RED) {
-            robot.drive.followTrajectorySequenceAsync(preloadRedRight);
-        } else if (Parking == SleeveDetectionPipeline.Color.MAGENTA) {
-            robot.drive.followTrajectorySequenceAsync(preloadMagentaLeft);
+        if (Parking.equals(SleeveDetectionPipeline.Color.RED)) {
+            park = "red";
+            robot.drive.followTrajectorySequenceAsync(RedPark);
+        } else if (Parking.equals(SleeveDetectionPipeline.Color.MAGENTA)) {
+            park = "magenta";
+            robot.drive.followTrajectorySequenceAsync(MagentaPark);
         } else {
-            robot.drive.followTrajectorySequenceAsync(preloadBlueMiddle);
+            park = "blue";
+            robot.drive.followTrajectorySequenceAsync(BluePark);
         }
 
         //robot.drive.followTrajectorySequenceAsync(cycleLow);
@@ -900,6 +930,7 @@ public class CycleAutoRedRightLowLow extends LinearOpMode {
 //            telemetry.addData("x", poseEstimate.getX());
 //            telemetry.addData("y", poseEstimate.getY());
 //            telemetry.addData("heading", poseEstimate.getHeading());
+            telemetry.addData("PATH", park);
             telemetry.addData("time", timer.seconds());
             telemetry.update();
             robot.update();

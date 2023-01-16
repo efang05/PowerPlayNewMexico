@@ -19,7 +19,7 @@ public class Turret implements Subsystem {
     public static double integralSum = 0;
     private double lastError = 0;
 
-    private double targetAngle = 0;
+    public double targetAngle = 0;
     private double currentAngle;
     private final double deadzone = 2;
     public double rotation = 0;

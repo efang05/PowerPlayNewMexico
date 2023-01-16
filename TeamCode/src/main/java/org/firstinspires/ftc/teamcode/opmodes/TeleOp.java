@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.subsystems.Robot;
 
+// mason was here
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp
 public class TeleOp extends LinearOpMode {
     //Constants
@@ -25,8 +26,8 @@ public class TeleOp extends LinearOpMode {
     private boolean canTurn = false;
     double turretaddition = 10;
     double dtspeed = 1;
-    public double up = 1150;
-    public double mid = 800;
+    public double up = 1175;
+    public double mid = 950;
     public double low = 550;
     public double ground = 0;
     public double idle = 200;
@@ -38,7 +39,7 @@ public class TeleOp extends LinearOpMode {
     private double droppedvalue = 150;
     private boolean armup = true;
     private boolean lowheight = false;
-    private double horizontalback = 0.5;
+    private double horizontalback = 0.51;
     private double horizontallifted = 0.5;
     private double horizontalmiddle = 0.59;
     private double horizontalextended = 1;
@@ -46,6 +47,7 @@ public class TeleOp extends LinearOpMode {
     private String liftedpos = "lifted";
     private boolean running = false;
     private double highposarm = 1;
+    private int wowie = 0;
 
     private double prev_time = System.currentTimeMillis();
 
@@ -140,6 +142,7 @@ public class TeleOp extends LinearOpMode {
             //Vertical Slides Manual Control
                 if (gamepad2.left_stick_y > 0.5) {
                     robot.lift.targetHeight+=10;
+                    wowie+=1;
                 } else if (gamepad2.left_stick_y < -0.5) {
                     robot.lift.targetHeight-=10;
                 }
@@ -215,7 +218,11 @@ public class TeleOp extends LinearOpMode {
                             }
                     }
 
-
+                    if(gamepad2.right_stick_x>0.5){
+                        robot.turret.targetAngle+=2;
+                    }else if(gamepad2.right_stick_x<-0.5){
+                        robot.turret.targetAngle-=2;
+                    }
 
                     //Horizontal Slides Extend/Retract
 
@@ -286,9 +293,7 @@ public class TeleOp extends LinearOpMode {
                             canTurn = false;
                             horizontalpos = "back";
                             robot.lift.setTargetHeight(intaking);
-                            robot.intake.intake(1);
-                            if (timer2.milliseconds() > 500) {
-                                robot.intake.openClaw();
+                                robot.intake.fullyOpenClaw();
                                 if (timer.milliseconds() > 500) {
                                     if (gamepad1.left_bumper || gamepad2.left_bumper || robot.intake.getDistance() < 2) {
                                         robot.intake.closeClaw();
@@ -299,10 +304,9 @@ public class TeleOp extends LinearOpMode {
                                     }
                                     if(gamepad2.right_bumper){
                                         robot.lift.setHorizontalPosition(0.6);
-                                        robot.intake.setArmPos(0.46);
+                                        robot.intake.setArmPos(0.475);
                                     }
                                 }
-                            }
                             break;
                         case INTAKING2:
                             if(timer.milliseconds()>600){
@@ -325,7 +329,7 @@ public class TeleOp extends LinearOpMode {
                                 if (gamepad2.dpad_up) {
                                     robot.lift.setTargetHeight(up);
                                     robot.intake.setArmPos(highposarm);
-                                    robot.lift.setHorizontalPosition(0.64);
+                                    robot.lift.setHorizontalPosition(0.615);
                                     timer.reset();
                                     robotState = robotState.LIFTED;
                                     armup = true;
@@ -514,20 +518,20 @@ public class TeleOp extends LinearOpMode {
                         horizontalpos = "middle";
                     }
 
-                    if (gamepad2.left_stick_y > 0.5) {
-                        robot.lift.targetHeight+=10;
-                    } else if (gamepad2.left_stick_y < -0.5) {
-                        robot.lift.targetHeight-=10;
+                    if (-gamepad2.left_stick_y > 0.5) {
+                        robot.lift.targetHeight+=3;
+                    } else if (-gamepad2.left_stick_y < -0.5) {
+                        robot.lift.targetHeight-=3;
                     }
 
                     //Vertical Slides SlightDrop/SlightLift
-                    if (robotState == robotState.LIFTED && gamepad2.left_bumper && liftedpos == "lifted") {
-                        robot.lift.setTargetHeight(robot.lift.getCurrentHeight() - droppedvalue);
-                        liftedpos = "dropped";
-                    } else if (robotState == robotState.LIFTED && gamepad2.left_bumper && liftedpos == "dropped") {
-                        robot.lift.setTargetHeight(robot.lift.getCurrentHeight() + droppedvalue);
-                        liftedpos = "lifted";
-                    }
+//                    if (robotState == robotState.LIFTED && gamepad2.left_bumper && liftedpos == "lifted") {
+//                        robot.lift.setTargetHeight(robot.lift.getCurrentHeight() - droppedvalue);
+//                        liftedpos = "dropped";
+//                    } else if (robotState == robotState.LIFTED && gamepad2.left_bumper && liftedpos == "dropped") {
+//                        robot.lift.setTargetHeight(robot.lift.getCurrentHeight() + droppedvalue);
+//                        liftedpos = "lifted";
+//                    }
 
                     //Turret Presets
                     if (canTurn = true) {
@@ -562,11 +566,10 @@ public class TeleOp extends LinearOpMode {
                             robot.intake.closeClaw();
                             robot.intake.liftArm();
                             robot.lift.setHorizontalPosition(horizontallifted);
-                            robot.lift.setTargetHeight(idle);
                             if (timer.milliseconds() > 500) {
                                 if (gamepad1.left_bumper) {
-                                    robot.lift.setTargetHeight(intaking);
-                                    robot.lift.setTargetHeight(30);
+                                    robot.lift.setTargetHeight(50);
+                                    robot.lift.setHorizontalPosition(0.6);
                                     timer.reset();
                                     robotState = robotState.INTAKING;
                                 }
@@ -574,7 +577,6 @@ public class TeleOp extends LinearOpMode {
                             break;
                         case INTAKING:
                             canTurn = false;
-                            robot.lift.setHorizontalPosition(horizontalback);
                             robot.intake.dropArm();
                             robot.intake.openClaw();
                             robot.intake.fullyOpenClaw();
@@ -595,8 +597,8 @@ public class TeleOp extends LinearOpMode {
                             }
                             if (timer.milliseconds() > 500) {
                                 if (gamepad1.left_bumper) {
-                                    robot.lift.setTargetHeight(intaking);
-                                    robot.lift.setTargetHeight(30);
+                                    robot.lift.setHorizontalPosition(0.6);
+                                    robot.lift.setTargetHeight(50);
                                     timer.reset();
                                     timer2.reset();
                                     robotState = robotState.INTAKING;
@@ -694,6 +696,7 @@ public class TeleOp extends LinearOpMode {
                                     robot.lift.setTargetHeight(idle);
                                     robot.intake.liftArm();
                                     robot.turret.setTargetAngle(back);
+                                    robot.lift.setTargetHeight(idle);
                                     robotState = robotState.IDLE;
                                     timer.reset();
                                 } else {
@@ -701,6 +704,7 @@ public class TeleOp extends LinearOpMode {
                                     robot.intake.liftArm();
                                     if (timer.milliseconds()>marker2) {
                                         robot.turret.setTargetAngle(back);
+                                        robot.lift.setTargetHeight(idle);
                                         robotState = robotState.IDLE;
                                         timer.reset();
                                     }
@@ -823,6 +827,7 @@ public class TeleOp extends LinearOpMode {
             telemetry.addData("timer2", timer2);
             telemetry.addData("autotimer", autotimer.milliseconds());
             telemetry.addData("running?", running);
+            telemetry.addData("wowie", wowie);
             robot.update();
         }
     }
